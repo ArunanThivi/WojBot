@@ -14,11 +14,11 @@ bot.once('ready', () => {
  * NEWEST_ID = Holds the id of the most recent tweet recieved. 
  */
 var latest = {
-    "haynes": "1328796295356551170",
+    "haynes": "1328847604621352961",
     "koc": "1328836478194114562",
-    "shams": "1328795384890728448",
+    "shams": "1328835383606587397",
     "stein": "1328780236025180161",
-    "woj": "1328619251117252608"
+    "woj": "1328758444116086785"
 }
 const sources = {
     "haynes": "57710919",
@@ -32,7 +32,7 @@ const sources = {
  */
 var tweets = [];
 
-var channelIDs = ["778169140455145472"];
+var channelIDs = ["778169140455145472", "280007031140646913", "746209966662352896"];
 
 bot.on('tweet', tweets => {
     console.log(channelIDs);
@@ -61,54 +61,57 @@ bot.on('tweet', tweets => {
                         break;
                 }
             }
-        });
+        }).catch(console.error);
     }
 	
 });
 
 bot.on('message', message => {
     if (message.content === "!here") {
-        channelIDs.push(message.channel.id);
+        if (channelIDs[message.channel.id] == null) {
+            channelIDs.push(message.channel.id);
+        }
     }
     if (message.content === "!channels") {
         console.log(channelIDs);
     }
+    if (message.content === "!remove") {
+        if (channelIDs[message.channel.id] == null) {
+            channelIDs.splice(channelIDs.indexOf(message.channel.id), 1);
+        }
+    }
 })
 
 /**
- * Makes a request to Twitter API for any new tweets from @wojespn not including retweets. Repeats every 2000ms
+ * Makes a request to Twitter API for any new tweets from sources not including retweets. Repeats every 10000ms
  */
 async function getRequest() {
 
     tweets = []; //Empty Array
 
-    var timeOutPromise = new Promise(function(resolve, reject) {
-        // 10 Second delay
-        setTimeout(resolve, 10000, 'Timeout Done');
-    });
-
-    Promise.all([getTweets("haynes"), getTweets("koc"), getTweets("shams"), getTweets("stein"), getTweets("woj"), timeOutPromise]).then(function(values) {
+    Promise.all([/*getTweets("haynes"), getTweets("koc"), getTweets("shams"), getTweets("stein"), */getTweets("woj"), timeOutPromise]).then(function(values) {
         try {
-            collectData(values[0].body, "haynes");
+            /*collectData(values[0].body, "haynes");
             collectData(values[1].body, "koc");
             collectData(values[2].body, "shams");
-            collectData(values[3].body, "stein");
-            collectData(values[4].body, "woj");
+            collectData(values[3].body, "stein");*/
+            collectData(values[0].body, "woj");
         } catch(e) {
             console.log(e);
         }
         if (tweets.length > 0) {
-            tweets.sort((a, b) => (a.created_at > b.created_at) ?  1 : -1); //Sort tweets chronoc
-            bot.emit('tweet', tweets);
+            tweets.sort((a, b) => (a.created_at > b.created_at) ?  1 : -1); //Sort tweets chronologically
+            bot.emit('tweet', tweets); 
         }
         getRequest(); //Repeat Call
-    });
+    }).catch(console.error);
 };
 
 async function getTweets(author) {
     const params = {
-        'query':`sources from:${sources[author]} -is:retweet`,
-        'tweet.fields': 'author_id,created_at'
+        'query':`source from:${sources[author]} -is:retweet`,
+        'tweet.fields': 'author_id,created_at',
+        'since_id': latest[author]
     }
     
         return await needle('get', endpointURL, params, { headers: {
@@ -117,15 +120,23 @@ async function getTweets(author) {
 }
 
 function collectData(data, author) {
-    if (data.meta.newest_id > latest[author]) {
-        for (tweet of data.data) {
-            if (tweet.id > latest[author]) {
+    try {
+        if (data.meta && data.meta.result_count > 0) {
+            for (tweet of data.data) {
+                console.log(tweet.id);
                 tweets.push(tweet)
             }
+            latest[author] = data.meta.newest_id;
         }
-        latest[author] = data.meta.newest_id;
+    } catch (error) {
+        return timeOutPromise;
     }
 }
+
+var timeOutPromise = new Promise(function(resolve, reject) {
+    // 10 Second delay
+    setTimeout(resolve, 30000, 'Timeout Done');
+});
 
 getRequest();
 bot.login(discordToken);
