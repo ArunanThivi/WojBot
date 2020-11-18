@@ -89,13 +89,13 @@ async function getRequest() {
 
     tweets = []; //Empty Array
 
-    Promise.all([/*getTweets("haynes"), getTweets("koc"), getTweets("shams"), getTweets("stein"), */getTweets("woj"), timeOutPromise]).then(function(values) {
+    Promise.all([getTweets("haynes"), getTweets("koc"), getTweets("shams"), getTweets("stein"), getTweets("woj"), timeOutPromise]).then(function(values) {
         try {
-            /*collectData(values[0].body, "haynes");
+            collectData(values[0].body, "haynes");
             collectData(values[1].body, "koc");
             collectData(values[2].body, "shams");
-            collectData(values[3].body, "stein");*/
-            collectData(values[0].body, "woj");
+            collectData(values[3].body, "stein");
+            collectData(values[4].body, "woj");
         } catch(e) {
             console.log(e);
         }
