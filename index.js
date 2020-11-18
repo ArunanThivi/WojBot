@@ -7,69 +7,99 @@ const {discordToken, twitterToken, endpointURL} = require('./config.json'); // A
 const bot = new Discord.Client();
 
 bot.once('ready', () => {
-	console.log('Ready!');
+    console.log('Ready!');
+    bot.user.setActivity('NBA Free Agency', { type: 'WATCHING' })
+    .then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
+    .catch(console.error);
 });
 /**
  * NEWEST_ID = Holds the id of the most recent tweet recieved. 
  */
-var newest_id = 0;
+var latest = {
+    "woj": "1328619251117252608",
+    "shams": "1328795384890728448"
+}
+const sources = {
+    "woj": "50323173",
+    "shams": "178580925"
+}
 /**
  * TWEETS = Holds a list of tweets that have been fetched from API but not yet published in server
  */
 var tweets = [];
 
-bot.on('tweet', tweets => {    
-    var channel = bot.channels.fetch("778169140455145472")
-    channel.then(function(result) {
-        result.send('\n**WOJ BOMB**\n\nhttps://twitter.com/wojespn/status/' + tweets.pop());
-    });
+var channelID = "778169140455145472";
+
+bot.on('tweet', tweets => {
+   // if (channelID != null) {    
+        var channel = bot.channels.fetch(channelID);
+        channel.then(function(result) {
+            let tweet = tweets.pop();
+            if (tweet.author_id == sources["shams"]) {
+                result.send('\n**SHAMS BOMB**\n\nhttps://twitter.com/ShamsCharania/status/' + tweet.id);
+            } else if (tweet.author_id == sources["woj"]) {
+                result.send('\n**WOJ BOMB**\n\nhttps://twitter.com/wojespn/status/' + tweet.id);
+            }
+            });
+    //} else {
+   //     console.log("Channel not set! Use !here to set a channel!");
+   // }
 	
 });
+
+bot.on('message', message => {
+    if (message.content === "!here") {
+        channelID = message.channel.id;
+    }
+})
 
 /**
  * Makes a request to Twitter API for any new tweets from @wojespn not including retweets. Repeats every 2000ms
  */
 async function getRequest() {
 
-    const params = {
-        'query':"sources from:50323173 -is:retweet",
-    } 
-
-    const res = await needle('get', endpointURL, params, { headers: {
-        "authorization": `Bearer ${twitterToken}`
-    }})
-
     var timeOutPromise = new Promise(function(resolve, reject) {
         // 2 Second delay
-        setTimeout(resolve, 2000, 'Timeout Done');
+        setTimeout(resolve, 4000, 'Timeout Done');
     });
 
-    Promise.all([res, timeOutPromise]).then(function(values) {
+    Promise.all([getTweets("woj"), getTweets("shams"), timeOutPromise]).then(function(values) {
         try {
-            var data = values[0].body.data;
-            if (values[0].body.meta.newest_id > newest_id) {
-                for (tweet of data) {
-                    if (tweet.id > newest_id) {
-                        tweets.push(tweet.id)
-                    }
-                }
-                newest_id = values[0].body.meta.newest_id;
-            }
+            collectData(values[0].body, "woj");
+            collectData(values[1].body, "shams");
         } catch(e) {
             console.log(e);
         }
         if (tweets.length > 0) {
+            tweets.sort((a, b) => (a.created_at < b.created_at) ?  1 : -1); //Sort tweets chronoc
             bot.emit('tweet', tweets);
         }
         getRequest(); //Repeat Call
     });
 };
 
+async function getTweets(author) {
+    const params = {
+        'query':`sources from:${sources[author]} -is:retweet`,
+        'tweet.fields': 'author_id,created_at'
+    }
+    
+        return await needle('get', endpointURL, params, { headers: {
+        "authorization": `Bearer ${twitterToken}`
+    }});
+}
+
+function collectData(data, author) {
+    if (data.meta.newest_id > latest[author]) {
+        for (tweet of data.data) {
+            if (tweet.id > latest[author]) {
+                tweets.push(tweet)
+            }
+        }
+        latest[author] = data.meta.newest_id;
+    }
+}
+
 getRequest();
 bot.login(discordToken);
 
-/** 
-50323173 - @wojespn twitter ID
-178580925 - @Shams twitter ID
-"sources from:50323173" <- search rule
-*/ 
