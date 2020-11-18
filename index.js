@@ -70,6 +70,9 @@ bot.on('message', message => {
     if (message.content === "!here") {
         channelIDs.push(message.channel.id);
     }
+    if (message.content === "!channels") {
+        console.log(channelIDs);
+    }
 })
 
 /**
