@@ -53,7 +53,7 @@ m.on('wojespn', function(tweet) {
   console.log('WOJ BOMB', tweet);
 });
 
-//m.start('ShamsCharania', 'source', 30 * 1000);
+m.start('ShamsCharania', 'source', 30 * 1000);
 
 m.on('ShamsCharania', function(tweet) {
   for (c of channelIDs) {
@@ -64,7 +64,7 @@ m.on('ShamsCharania', function(tweet) {
   }
 });
 
-//m.start('ChrisBHaynes', 'source', 30 * 1000);
+m.start('ChrisBHaynes', 'source', 30 * 1000);
 
 m.on('ChrisBHaynes', function(tweet) {
   for (c of channelIDs) {
@@ -75,7 +75,7 @@ m.on('ChrisBHaynes', function(tweet) {
   }
 });
 
-//m.start('TheSteinLine', 'source', 30 * 1000);
+m.start('TheSteinLine', 'source', 30 * 1000);
 
 m.on('TheSteinLine', function(tweet) {
   for (c of channelIDs) {
@@ -86,7 +86,7 @@ m.on('TheSteinLine', function(tweet) {
   }
 });
 
-//m.start('KevinOConnorNBA', 'source', 30 * 1000);
+m.start('KevinOConnorNBA', 'source', 30 * 1000);
 
 m.on('KevinOConnorNBA', function(tweet) {
   for (c of channelIDs) {
