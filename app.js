@@ -1,5 +1,5 @@
 const Discord = require('discord.js'); // Discord Bot API
-var Monitor = require('monitor-twitter');
+var Monitor = require('./monitor');
 const { discordToken, consumer_key, consumer_secret, access_token, access_token_secret } = require('./keys.json');
 
 var config = {
@@ -12,11 +12,11 @@ var config = {
 var m = new Monitor(config);
 const bot = new Discord.Client();
 
-var channelIDs = ["746209966662352896"];
+var channelIDs = ["778169140455145472"]; //746209966662352896 Berkeley server  778169140455145472 Test Server
 
 bot.once('ready', () => {
   console.log('Ready!');
-  bot.user.setActivity('JAMES HARDEN TRADE TALKS', { type: 'WATCHING' })
+  bot.user.setActivity('Harden Trade Talks', { type: 'WATCHING' })
     .then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
     .catch(console.error);
 });

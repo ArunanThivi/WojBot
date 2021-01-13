@@ -27,6 +27,8 @@
   "homepage": "https://github.com/ArunanThivi/WojBot#readme",
   "dependencies": {
     "discord.js": "^12.5.1",
-    "monitor-twitter": "^1.0.0"
+    "events": "^3.2.0",
+    "twit": "^2.2.11",
+    "underscore": "^1.12.0"
   }
 }
