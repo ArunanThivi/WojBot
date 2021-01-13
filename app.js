@@ -12,32 +12,17 @@ var config = {
 var m = new Monitor(config);
 const bot = new Discord.Client();
 
-var channelIDs = ["778169140455145472", "778799485131161640", "746209966662352896"];
+var channelIDs = ["746209966662352896"];
 
 bot.once('ready', () => {
   console.log('Ready!');
-  bot.user.setActivity('NBA Free Agency', { type: 'WATCHING' })
+  bot.user.setActivity('JAMES HARDEN TRADE TALKS', { type: 'WATCHING' })
     .then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
     .catch(console.error);
 });
 
 bot.login(discordToken);
 
-bot.on('message', message => {
-  if (message.content === "|here") {
-    if (channelIDs[message.channel.id] == null) {
-      channelIDs.push(message.channel.id);
-    }
-  }
-  if (message.content === "|channels") {
-    console.log(channelIDs);
-  }
-  if (message.content === "|remove") {
-    if (channelIDs[message.channel.id] == null) {
-      channelIDs.splice(channelIDs.indexOf(message.channel.id), 1);
-    }
-  }
-})
 
 // Watch the account 'wojespn' for Tweets containing 'source' every 30 seconds.
 
@@ -64,5 +49,27 @@ m.on('ShamsCharania', function (tweet) {
   console.log('SHAMS BOMB', tweet);
 });
 
-m.start('wojespn', 'source', 10 * 1000);
-m.start('ShamsCharania', 'source', 10 * 1000);
+m.on('ChrisBHaynes', function (tweet) {
+  for (c of channelIDs) {
+    var channel = bot.channels.fetch(c);
+    channel.then(function (result) {
+      result.send("__New Tweet from **Chris Haynes**__\n\n https://twitter.com/ShamsCharania/status/" + tweet.id);
+    }).catch(console.error);
+  }
+  console.log('SHAMS BOMB', tweet);
+});
+
+m.on('TheSteinLine', function (tweet) {
+  for (c of channelIDs) {
+    var channel = bot.channels.fetch(c);
+    channel.then(function (result) {
+      result.send("__New Tweet from **Marc Stein**__\n\n https://twitter.com/TheSteinLine/status/" + tweet.id);
+    }).catch(console.error);
+  }
+  console.log('SHAMS BOMB', tweet);
+});
+
+m.start('wojespn', 'Harden', 10 * 1000);
+m.start('ShamsCharania', 'Harden', 10 * 1000);
+m.start('TheSteinLine', 'Harden', 10 * 1000);
+m.start('ChrisBHaynes', 'Harden', 10 * 1000);

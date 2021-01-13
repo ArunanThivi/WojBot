@@ -1,0 +1,32 @@
+{
+  "name": "wojbot",
+  "version": "1.0.0",
+  "description": "A discord bot to track breaking news from top NBA reporters",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArunanThivi/WojBot.git"
+  },
+  "keywords": [
+    "NBA",
+    "Discord",
+    "Wojnarowski",
+    "Shams",
+    "Stein",
+    "Basketball"
+  ],
+  "author": "Arunan Thiviyanathan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ArunanThivi/WojBot/issues"
+  },
+  "homepage": "https://github.com/ArunanThivi/WojBot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "monitor-twitter": "^1.0.0"
+  }
+}
