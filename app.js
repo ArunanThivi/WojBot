@@ -1,5 +1,5 @@
 const Discord = require('discord.js'); // Discord Bot API
-var Monitor = require('./monitor');
+var Monitor = require('monitor-twitter');
 const { discordToken, consumer_key, consumer_secret, access_token, access_token_secret } = require('./keys.json');
 
 var config = {
@@ -12,20 +12,34 @@ var config = {
 var m = new Monitor(config);
 const bot = new Discord.Client();
 
-var channelIDs = ["778169140455145472"]; //746209966662352896 Berkeley server  778169140455145472 Test Server
+var channelIDs = ["795967278281261056", "746209966662352896", "778169140455145472"];
 
 bot.once('ready', () => {
   console.log('Ready!');
-  bot.user.setActivity('Harden Trade Talks', { type: 'WATCHING' })
+  bot.user.setActivity('NBA Draft Night!', { type: 'WATCHING' })
     .then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
     .catch(console.error);
 });
 
 bot.login(discordToken);
 
+bot.on('message', message => {
+  if (message.content === "|here") {
+    if (channelIDs[message.channel.id] == null) {
+      channelIDs.push(message.channel.id);
+    }
+  }
+  if (message.content === "|channels") {
+    console.log(channelIDs);
+  }
+  if (message.content === "|remove") {
+    if (channelIDs[message.channel.id] == null) {
+      channelIDs.splice(channelIDs.indexOf(message.channel.id), 1);
+    }
+  }
+})
 
 // Watch the account 'wojespn' for Tweets containing 'source' every 30 seconds.
-
 
 m.on('wojespn', function (tweet) {
   for (c of channelIDs) {
@@ -37,8 +51,6 @@ m.on('wojespn', function (tweet) {
   console.log('WOJ BOMB', tweet);
 });
 
-
-
 m.on('ShamsCharania', function (tweet) {
   for (c of channelIDs) {
     var channel = bot.channels.fetch(c);
@@ -49,27 +61,5 @@ m.on('ShamsCharania', function (tweet) {
   console.log('SHAMS BOMB', tweet);
 });
 
-m.on('ChrisBHaynes', function (tweet) {
-  for (c of channelIDs) {
-    var channel = bot.channels.fetch(c);
-    channel.then(function (result) {
-      result.send("__New Tweet from **Chris Haynes**__\n\n https://twitter.com/ShamsCharania/status/" + tweet.id);
-    }).catch(console.error);
-  }
-  console.log('SHAMS BOMB', tweet);
-});
-
-m.on('TheSteinLine', function (tweet) {
-  for (c of channelIDs) {
-    var channel = bot.channels.fetch(c);
-    channel.then(function (result) {
-      result.send("__New Tweet from **Marc Stein**__\n\n https://twitter.com/TheSteinLine/status/" + tweet.id);
-    }).catch(console.error);
-  }
-  console.log('SHAMS BOMB', tweet);
-});
-
-m.start('wojespn', 'Harden', 10 * 1000);
-m.start('ShamsCharania', 'Harden', 10 * 1000);
-m.start('TheSteinLine', 'Harden', 10 * 1000);
-m.start('ChrisBHaynes', 'Harden', 10 * 1000);
+m.start('ShamsCharania', 'source', 5 * 1000);
+m.start('wojespn', 'source', 5 * 1000);

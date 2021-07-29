@@ -28,6 +28,7 @@
   "dependencies": {
     "discord.js": "^12.5.1",
     "events": "^3.2.0",
+    "monitor-twitter": "^1.0.0",
     "twit": "^2.2.11",
     "underscore": "^1.12.0"
   }
